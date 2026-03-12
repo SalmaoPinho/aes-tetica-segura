@@ -1,7 +1,6 @@
 import socket
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey import RSA
-from Crypto.Hash import SHA256
 
 HOST = "127.0.0.1"
 PORT = 5000
@@ -28,7 +27,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             data += packet
 
 tam = int.from_bytes(data[:4], "big")
-
 pos = 4
 
 aes_encriptado = data[pos:pos+tam]
@@ -46,20 +44,14 @@ cipher_rsa = PKCS1_OAEP.new(private_key)
 aes_key = cipher_rsa.decrypt(aes_encriptado)
 
 cipher = AES.new(aes_key, AES.MODE_GCM, nonce=nonce)
-mensagem = cipher.decrypt_and_verify(ciphertext, tag)
 
-hash_recebido = mensagem[:32]
-arquivo = mensagem[32:]
-
-hash_calculado = SHA256.new(arquivo).digest()
-
-if hash_recebido == hash_calculado:
-    print("Integridade verificada")
+try:
+    arquivo = cipher.decrypt_and_verify(ciphertext, tag)
 
     with open("docs/arquivo_recebido.pdf", "wb") as f:
         f.write(arquivo)
 
-    print("Arquivo salvo com sucesso")
+    print("Arquivo recebido e salvo com sucesso")
 
-else:
-    print("Arquivo foi alterado")
+except ValueError:
+    print("Falha na autenticação")

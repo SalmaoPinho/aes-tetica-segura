@@ -1,8 +1,7 @@
 import socket
 from Crypto.Cipher import AES, PKCS1_OAEP
-from Crypto.Random import get_random_bytes
 from Crypto.PublicKey import RSA
-from Crypto.Hash import SHA256
+from Crypto.Random import get_random_bytes
 
 HOST = "127.0.0.1"
 PORT = 5000
@@ -18,13 +17,8 @@ aes_encriptado = cipher_rsa.encrypt(aes_key)
 with open("docs/bomdia.pdf", "rb") as file:
     data = file.read()
 
-hash_obj = SHA256.new(data)
-hash_bytes = hash_obj.digest()
-
-mensagem = hash_bytes + data
-
 cipher = AES.new(aes_key, AES.MODE_GCM)
-ciphertext, tag = cipher.encrypt_and_digest(mensagem)
+ciphertext, tag = cipher.encrypt_and_digest(data)
 
 payload = (
     len(aes_encriptado).to_bytes(4, "big") +
