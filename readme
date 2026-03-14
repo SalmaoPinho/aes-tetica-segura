@@ -1,0 +1,5 @@
+Fluxo de Execução:
+
+- generate.py (para gerar novas chaves)
+- receber_arquivo.py 
+- mandar_arquivo.py
